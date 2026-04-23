@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculateur score concours MP2</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Cinzel:wght@700;900&display=swap");
+
+    :root{
+      --bg:#060913;
+      --bg-elev:#0d1425;
+      --bg-card:#101a30;
+      --bg-soft:#131f39;
+      --ink:#f5f8ff;
+      --muted:#94a8c9;
+      --line:rgba(148,168,202,.25);
+      --accent:#42d6ff;
+      --accent-strong:#10b981;
+      --warn:#f59e0b;
+      --good:#22c55e;
+      --radius-lg:22px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif;
+      color:var(--ink);
+      line-height:1.45;
+      background:#060b18;
+      position:relative;
+      z-index:0;
+      overflow-x:hidden;
+    }
+    header, .wrapper{
+      position:relative;
+      z-index:1;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:-2;
+      background:
+        radial-gradient(1200px 560px at 10% -16%, rgba(66,214,255,.16), transparent 62%),
+        linear-gradient(145deg, #04060f 0%, #060b18 46%, #070d1c 100%);
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:-1;
+      background:radial-gradient(920px 520px at 90% 10%, rgba(16,185,129,.1), transparent 60%);
+    }
+    header{
+      max-width:1180px;
+      margin:28px auto 12px;
+      padding:0 16px;
+    }
+    header > .hero{
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      padding:22px 24px;
+      background:linear-gradient(165deg, rgba(16,26,48,.86), rgba(10,17,31,.88));
+      box-shadow:0 14px 34px rgba(1,4,10,.45), inset 0 1px 0 rgba(255,255,255,.03);
+      animation:rise .45s ease both;
+    }
+    h1{
+      margin:.2rem 0 .45rem;
+      font-size:clamp(1.5rem,1.2rem + 1.7vw,2.35rem);
+      letter-spacing:.2px;
+      font-weight:600;
+      text-align:center;
+    }
+    .title-danger{
+      color:#c10000;
+      font-family:"Cinzel","Times New Roman",serif;
+      font-weight:900;
+      letter-spacing:.35px;
+      text-shadow:0 0 0 currentColor;
+    }
+    .sub{
+      color:var(--muted);
+      max-width:72ch;
+    }
+
+    .wrapper{
+      max-width:1180px;
+      margin:0 auto 72px;
+      padding:12px 16px;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+      margin:8px 0 12px;
+    }
+    .tile{
+      background:linear-gradient(170deg, rgba(16,31,56,.82), rgba(12,20,37,.76));
+      border:1px solid var(--line);
+      padding:15px 16px;
+      border-radius:16px;
+      box-shadow:0 8px 24px rgba(2,5,12,.4), inset 0 1px 0 rgba(255,255,255,.02);
+      animation:rise .5s ease both;
+    }
+    .tile h3{
+      margin:0;
+      font-size:.88rem;
+      font-weight:600;
+      color:#9acff5;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+    .big{
+      font-size:clamp(1.6rem, 1.3rem + 1.3vw,2.15rem);
+      font-weight:700;
+      margin-top:8px;
+    }
+
+    .options, .btns{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(14,24,43,.84), rgba(10,17,32,.72));
+      border-radius:16px;
+      padding:12px 14px;
+      box-shadow:0 8px 24px rgba(2,5,12,.35);
+    }
+    .options{
+      margin-top:4px;
+      font-size:.9rem;
+      color:#d0ddf5;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      animation:rise .55s ease both;
+    }
+    .options input[type="checkbox"]{
+      accent-color:var(--accent-strong);
+      width:18px;
+      height:18px;
+      margin:0;
+    }
+
+    .btns{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      animation:rise .6s ease both;
+    }
+    button{
+      cursor:pointer;
+      border:1px solid rgba(150,177,216,.34);
+      background:linear-gradient(180deg, rgba(28,43,72,.9), rgba(16,28,50,.95));
+      color:#eaf1ff;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:650;
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    button:hover{
+      transform:translateY(-1px);
+      border-color:rgba(66,214,255,.7);
+      box-shadow:0 8px 16px rgba(2,8,20,.38);
+    }
+    button:active{transform:translateY(0)}
+    .ok{
+      border-color:rgba(16,185,129,.65);
+      background:linear-gradient(180deg, rgba(7,89,74,.95), rgba(7,68,56,.95));
+    }
+    .ok:hover{border-color:#36d399}
+    .ghost{background:rgba(9,15,28,.75)}
+
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      margin-top:14px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:15px 14px 13px;
+      background:
+        radial-gradient(120% 130% at 100% -20%, rgba(66,214,255,.12), transparent 55%),
+        linear-gradient(160deg, rgba(16,26,48,.92), rgba(11,19,35,.86));
+      box-shadow:0 10px 26px rgba(3,7,16,.36), inset 0 1px 0 rgba(255,255,255,.03);
+      animation:rise .5s ease both;
+    }
+    .card-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .card h2{
+      margin:0;
+      font-size:1.08rem;
+      line-height:1.28;
+      font-weight:650;
+      color:#eff5ff;
+    }
+    .coeff{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:.78rem;
+      border:1px solid rgba(66,214,255,.52);
+      color:#8fe8ff;
+      background:rgba(8,48,66,.5);
+    }
+
+    .row{display:grid; grid-template-columns:1fr; gap:8px; margin:10px 0 8px}
+    .row label{font-size:.84rem; color:#d6e3fa}
+    input.note{
+      width:100%;
+      background:rgba(6,12,26,.86);
+      border:1px solid rgba(132,156,194,.33);
+      color:#f1f6ff;
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    input.note::placeholder{color:#8093b5}
+    input.note:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(66,214,255,.18);
+      background:rgba(8,16,34,.95);
+    }
+
+    .inline-help{
+      font-size:.78rem;
+      color:#8cccf0;
+      letter-spacing:.1px;
+    }
+    .avg{
+      margin-top:8px;
+      font-size:1.1rem;
+      font-weight:700;
+      color:#f7fbff;
+    }
+    .subject-note{
+      font-size:.78rem;
+      color:#9eb0cf;
+      margin-top:6px;
+    }
+
+    .warning{
+      margin-top:12px;
+      font-size:.82rem;
+      color:#f7c84f;
+      background:rgba(93,67,10,.16);
+      border:1px solid rgba(245,158,11,.35);
+      border-radius:12px;
+      padding:9px 12px;
+      animation:rise .7s ease both;
+    }
+    .footer{
+      max-width:1180px;
+      margin:12px auto 34px;
+      padding:0 16px;
+      color:#90a4c6;
+      font-size:.86rem;
+    }
+    code{
+      font-family:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+      background:rgba(125,147,182,.16);
+      border-radius:8px;
+      padding:.1rem .36rem;
+    }
+
+    @keyframes rise{
+      from{opacity:0; transform:translateY(12px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+    .grid .card:nth-child(2){animation-delay:.03s}
+    .grid .card:nth-child(3){animation-delay:.06s}
+    .grid .card:nth-child(4){animation-delay:.09s}
+    .grid .card:nth-child(5){animation-delay:.12s}
+    .grid .card:nth-child(6){animation-delay:.15s}
+    .grid .card:nth-child(7){animation-delay:.18s}
+    .grid .card:nth-child(8){animation-delay:.21s}
+
+    @media (max-width: 760px){
+      header{margin:16px auto 10px}
+      header>.hero{padding:18px 16px}
+      .wrapper{padding:10px 12px 24px}
+      .kpi{grid-template-columns:1fr 1fr}
+      .btns{padding:10px}
+      button{width:100%}
+    }
+    @media (max-width:540px){
+      .kpi{grid-template-columns:1fr}
+      .card{padding:14px 12px}
+      .coeff{font-size:.75rem; padding:4px 8px}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{
+        animation:none !important;
+        transition:none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <h1>ya bhim</h1>
+    </div>
+  </header>
+
+  <div class="wrapper">
+
+    <section class="kpi" id="kpis">
+      <div class="tile"><h3>Score brut (sans bonus)</h3><div class="big" id="score-brut">0.00</div></div>
+      <div class="tile"><h3>Bonus appliqué</h3><div class="big" id="bonus-points">+15</div></div>
+      <div class="tile"><h3>Score final</h3><div class="big" id="score-final">0.00</div></div>
+      <div class="tile"><h3>Rang estimé 2025</h3><div class="big" id="rank-display">—</div></div>
+    </section>
+
+    <div class="options">
+      <input type="checkbox" id="bonus" checked />
+      <label for="bonus">Ajouter la bonification de +15 points</label>
+    </div>
+
+    <div class="btns">
+      <button id="reset" class="ghost">Réinitialiser</button>
+      <button id="prefill" title="Exemple rapide">Pré-remplir un exemple</button>
+    </div>
+
+    <div class="grid" id="subjects"></div>
+
+  </div>
+
+  <!-- Carte d'une matière -->
+  <template id="card-template">
+    <div class="card">
+      <div class="card-head">
+        <h2 class="title"></h2>
+        <div class="coeff">Coeff <span class="cVal"></span></div>
+      </div>
+      <div class="row">
+        <label>Note /20
+          <input type="text" inputmode="decimal" class="inp note" placeholder="0–20" />
+        </label>
+      </div>
+      <div class="inline-help"></div>
+      <div class="avg">Contribution (score partiel) : <span class="avgVal">0.00</span></div>
+      <div class="subject-note"></div>
+    </div>
+  </template>
+
+  <!-- 1) Script avec les données (DOIT être avant le script principal) -->
+  <script src="rangs2025.js"></script>
+
+  <!-- 2) Script principal -->
+  <script>
+    // ----- Config matières concours MP2 -----
+    const TOTAL_COEFF = 43;
+    const SUBJECTS = [
+      { key: 'math1',  name: 'Mathématiques I',                        coeff: 10 },
+      { key: 'phys',   name: 'Physique',                               coeff: 10 },
+      { key: 'chimie', name: 'Chimie',                                 coeff: 4  },
+      { key: 'sti',    name: "Sciences et Techniques de l'Ingénieur",  coeff: 4  },
+      { key: 'info',   name: 'Informatique',                           coeff: 3  },
+      { key: 'fr',     name: 'Français',                               coeff: 3  },
+      { key: 'ang',    name: 'Anglais',                                coeff: 3  },
+      { key: 'math2',  name: 'Mathématiques II',                       coeff: 6  }
+    ];
+
+    const clamp20 = v => (isNaN(v) ? null : Math.max(0, Math.min(20, v)));
+    const fmt = (n) => (n == null || isNaN(n)) ? '0.00' : n.toFixed(2);
+    const parseNote = (value) => {
+      const normalized = String(value ?? '').trim().replace(',', '.');
+      if (!normalized || normalized === '.' || normalized === '-') return null;
+      const n = Number(normalized);
+      return Number.isFinite(n) ? n : null;
+    };
+
+// RANG_DATA vient de rangs2025.js
+let RANK_DATA = Array.isArray(window.RANK_DATA) ? [...window.RANK_DATA] : [];
+
+// Convertir les scores string avec virgule -> nombre JS
+RANK_DATA = RANK_DATA
+  .map(item => ({
+    rank: item.rank,
+    score: parseNote(item.score)
+  }))
+  .filter(item => item.score != null);
+
+// Trier par score décroissant
+if (RANK_DATA.length) {
+  RANK_DATA.sort((a,b) => b.score - a.score);
+}
+    // ----- Construction UI -----
+    function buildCard(container, spec){
+      const tpl = document.getElementById('card-template');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      node.dataset.key = spec.key;
+      node.querySelector('.title').textContent = spec.name;
+      node.querySelector('.cVal').textContent = spec.coeff;
+      node.querySelector('.inline-help').textContent = `Score partiel = note × ${spec.coeff}`;
+
+      const input = node.querySelector('input.note');
+      input.addEventListener('input', () => {
+        calcOne(node, spec);
+        calcAll();
+      });
+      input.addEventListener('blur', () => {
+        const val = clamp20(parseNote(input.value));
+        input.value = val == null ? '' : String(val);
+        calcOne(node, spec);
+        calcAll();
+      });
+
+      container.appendChild(node);
+      return node;
+    }
+
+    function makeUI() {
+      const host = document.getElementById('subjects');
+      SUBJECTS.forEach(s => buildCard(host, s));
+    }
+
+    // ----- Calculs matières -----
+    function calcOne(card, spec) {
+      const input = card.querySelector('input.note');
+      const raw = parseNote(input.value);
+      const val = clamp20(raw);
+      const contribution = (val == null ? 0 : val * spec.coeff);
+      card.querySelector('.avgVal').textContent = fmt(contribution);
+      return contribution;
+    }
+
+    // ----- Estimation du rang -----
+    function estimateRank(score, data){
+      if (!data.length) return null;
+
+      // Rang exact (tolérance flottante)
+      for (const d of data){
+        if (Math.abs(d.score - score) < 0.001){
+          return { exactRank: d.rank };
+        }
+      }
+
+      // Au-dessus du meilleur score
+      if (score > data[0].score){
+        return { minRank: 1, maxRank: data[0].rank };
+      }
+
+      // Entre deux scores connus
+      for (let i=0; i<data.length-1; i++){
+        const s1 = data[i].score;
+        const s2 = data[i+1].score;
+        if (score <= s1 && score >= s2){
+          const r1 = data[i].rank;
+          const r2 = data[i+1].rank;
+          return {
+            minRank: Math.min(r1, r2),
+            maxRank: Math.max(r1, r2)
+          };
+        }
+      }
+
+      // En dessous du plus petit score connu
+      const last = data[data.length-1];
+      return { minRank: last.rank, maxRank: last.rank + 50 };
+    }
+
+    // ----- Calcul global score + rang -----
+    function calcAll(){
+      let rawScore = 0;
+
+      SUBJECTS.forEach(spec => {
+        const card = document.querySelector('.card[data-key="'+spec.key+'"]');
+        if (!card) return;
+        rawScore += calcOne(card, spec);
+      });
+
+      const bonusChecked = document.getElementById('bonus').checked;
+      const bonus = bonusChecked ? 15 : 0;
+      const finalScore = rawScore + bonus;
+
+      document.getElementById('score-brut').textContent = fmt(rawScore);
+      document.getElementById('bonus-points').textContent = bonusChecked ? '+15' : '+0';
+      document.getElementById('score-final').textContent = fmt(finalScore);
+
+      const rankEl = document.getElementById('rank-display');
+      const rankInfo = estimateRank(finalScore, RANK_DATA);
+
+      if (!RANK_DATA.length){
+        rankEl.textContent = 'Aucune donnée';
+        rankEl.style.color = 'var(--warn)';
+      } else if (!rankInfo){
+        rankEl.textContent = 'N/A';
+        rankEl.style.color = 'var(--warn)';
+      } else if (rankInfo.exactRank != null){
+        rankEl.textContent = '≈ ' + rankInfo.exactRank;
+        rankEl.style.color = 'var(--good)';
+      } else {
+        rankEl.textContent = `entre ${rankInfo.minRank} et ${rankInfo.maxRank}`;
+        rankEl.style.color = 'var(--good)';
+      }
+    }
+
+    function resetAll(){
+      document.querySelectorAll('input.note').forEach(i => i.value = '');
+      document.querySelectorAll('.avgVal').forEach(s => s.textContent = '0.00');
+      document.getElementById('score-brut').textContent = '0.00';
+      document.getElementById('score-final').textContent = '0.00';
+      document.getElementById('rank-display').textContent = '—';
+      document.getElementById('rank-display').style.color = '#e5e7eb';
+    }
+
+    function prefill(){
+      const example = {
+        math1: 14,
+        phys:  13,
+        chimie:12,
+        sti:   11.5,
+        info:  15,
+        fr:    13,
+        ang:   14,
+        math2: 13.5
+      };
+      for (const [key,val] of Object.entries(example)){
+        const card = document.querySelector('.card[data-key="'+key+'"]');
+        if (!card) continue;
+        const input = card.querySelector('input.note');
+        input.value = val;
+      }
+      calcAll();
+    }
+
+    // ----- Init -----
+    makeUI();
+    calcAll();
+
+    document.getElementById('reset').addEventListener('click', resetAll);
+    document.getElementById('prefill').addEventListener('click', prefill);
+    document.getElementById('bonus').addEventListener('change', calcAll);
+  </script>
+
+  <script>
+    window.va = window.va || function(){ (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
+
